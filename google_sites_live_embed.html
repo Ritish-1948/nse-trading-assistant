@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NSE Day Trading Live Terminal — Google Sites Embed</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0B0F19; color: #E2E8F0; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="p-3 sm:p-4 space-y-4">
+
+  <!-- Live Feed Connection Bar -->
+  <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-2.5">
+      <span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+      <div>
+        <div class="text-sm font-bold text-white flex items-center gap-2">
+          Hybrid AI Day-Trading Live Terminal (20 NSE Stocks)
+          <span id="feedSourceBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 mono">FALLBACK SNAPSHOT</span>
+        </div>
+        <div id="feedTimestamp" class="text-[11px] text-slate-400 mono">Last Updated: 2026-11-13 15:35:00 IST &bull; Auto-refreshes every 60s</div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <input id="feedUrlInput" type="url" placeholder="https://YOUR-USER.github.io/YOUR-REPO/live_agent_feed.json"
+        class="w-64 sm:w-80 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-sky-300 mono" />
+      <button type="button" id="connectFeedBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition">
+        Connect Live Feed
+      </button>
+      <button type="button" id="refreshNowBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white transition">
+        Refresh Now
+      </button>
+    </div>
+  </div>
+
+  <!-- Session Rules & Hard Exit Banner -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+    <div class="bg-slate-900/90 border border-emerald-500/30 rounded-lg p-2.5">
+      <div class="font-bold text-emerald-400 mono">BUY ENTRY (09:20–10:45 AM IST)</div>
+      <div class="text-slate-300 mt-0.5">Buy on 5-min candle close above <strong>BUY Point (&gt;)</strong>. Book 50% at T1 &amp; move Stop-Loss to Entry.</div>
+    </div>
+    <div class="bg-slate-900/90 border border-rose-500/30 rounded-lg p-2.5">
+      <div class="font-bold text-rose-400 mono">SELL / SHORT ENTRY</div>
+      <div class="text-slate-300 mt-0.5">Short-Sell on 5-min candle close below <strong>SELL Point (&lt;)</strong>. Cover 50% at T1 &amp; trail Stop-Loss.</div>
+    </div>
+    <div class="bg-slate-900/90 border border-amber-500/40 rounded-lg p-2.5">
+      <div class="font-bold text-amber-300 mono">MANDATORY MARKET EXIT: 03:15 PM IST</div>
+      <div class="text-slate-300 mt-0.5">Exit 100% at Target 2, Stop-Loss, or <strong>03:15 PM IST</strong> sharp (avoids 03:20 PM broker auto-square-off).</div>
+    </div>
+  </div>
+
+  <!-- Filter & Live Table -->
+  <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-3">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap gap-1.5" id="filterBtnGroup">
+        <button type="button" data-f="all" class="f-btn px-2.5 py-1 rounded text-xs font-semibold bg-sky-600 text-white">All 20 Stocks</button>
+        <button type="button" data-f="INTRADAY BUY" class="f-btn px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-emerald-300">Intraday BUY</button>
+        <button type="button" data-f="INTRADAY SELL (SHORT)" class="f-btn px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-rose-300">Intraday SELL (Short)</button>
+        <button type="button" data-f="RANGE / WAIT FOR BREAKOUT" class="f-btn px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-amber-300">Breakout Watch</button>
+      </div>
+      <div id="niftyBenchmarkText" class="text-xs mono text-slate-300">Nifty 50 (^NSEI): 25,144.30 (Strong Uptrend)</div>
+    </div>
+
+    <div class="overflow-x-auto border border-slate-800 rounded-lg">
+      <table class="w-full text-left border-collapse text-xs">
+        <thead>
+          <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 mono">
+            <th class="py-2 px-2.5">Company</th>
+            <th class="py-2 px-2.5">Day Bias</th>
+            <th class="py-2 px-2.5 text-right">Last Price</th>
+            <th class="py-2 px-2.5 text-right text-emerald-400">BUY (&gt;)</th>
+            <th class="py-2 px-2.5 text-right text-emerald-300">Buy T1 / T2</th>
+            <th class="py-2 px-2.5 text-right text-rose-400">Buy SL</th>
+            <th class="py-2 px-2.5 text-right text-rose-400">SELL (&lt;)</th>
+            <th class="py-2 px-2.5 text-right text-emerald-300">Sell T1 / T2</th>
+            <th class="py-2 px-2.5 text-right text-rose-400">Sell SL</th>
+            <th class="py-2 px-2.5 text-right">ML Win %</th>
+          </tr>
+        </thead>
+        <tbody id="liveTableBody" class="divide-y divide-slate-800/70 mono"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Optional: Hardcode your GitHub Pages URL below after pushing your repo so visitors never have to type it:
+    // e.g. const DEFAULT_LIVE_FEED_URL = "https://ritishsenthil.github.io/nse-trading-assistant/live_agent_feed.json";
+    const DEFAULT_LIVE_FEED_URL = "";
+    const FALLBACK_FEED = {"agent_feed_version":"3.0","generated_at_ist":"2026-11-13 15:35:00 IST","source_mode":"24_7_DIRECT_20_STOCK_NSE_SCANNER (Zero CSV)","endpoint_urls":{"all_signals":"http://127.0.0.1:8765/api/v1/signals","best_trade":"http://127.0.0.1:8765/api/v1/best-trade"},"index_benchmark":{"symbol":"^NSEI","meta":{"Open":25209.85,"High":25246.35,"Low":25054.4,"Close":25144.3,"Volume":285000,"high_52week":26373.2,"low_52week":22179.9,"pe_ratio":22.4,"market_cap_cr":0.0,"eps":0.0,"div_yield":1.25,"name":"NIFTY 50 Index","sector":"Benchmark Index","exchange":"INDEXNSE"},"regime":"Strong Uptrend","adx_14":49.73},"selection_status":"ACTIONABLE_SETUPS_FOUND (4 Swing BUYs / 20 Day-Trading Plans Ready)","best_selected_trade":{"ticker":"RELIANCE.NS","name":"Reliance Industries Ltd","sector":"Energy & Conglomerate","as_of_date":"2026-11-13","action_signal":"BUY","intraday_bias":"INTRADAY BUY","gatekeeper_passed":true,"ml_win_probability":0.694,"ml_win_probability_pct":69.4,"entry_price":1339.7,"stop_loss_price":1316.52,"target_price":1386.06,"day_buy_entry":1342.48,"day_buy_t1":1357.55,"day_buy_t2":1366.82,"day_buy_sl":1333.21,"day_sell_entry":1336.92,"day_sell_t1":1321.85,"day_sell_t2":1312.58,"day_sell_sl":1346.19,"atr_14":23.18,"risk_reward_ratio":2.0,"recommended_shares":43,"intraday_shares":107,"position_notional_value":57607.1,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":54.35,"oos_roc_auc":0.5965,"oos_precision_at_60_pct":30.0,"oos_profit_factor_at_60":1.03,"gatekeeper_reasons":["Regime Aligned: Stock (Strong Uptrend) & Index (Strong Uptrend) both support trend continuation.","ML Win Probability (69.40%) meets/exceeds the 60% threshold.","Reward-to-Risk ratio (1:2.00) satisfies the 1:2.0 requirement.","Note: 60-day swing high at 1350.70 sits between Entry (1339.70) and Target (1386.06); monitor price action near 1350.70."]},"qualifying_buy_candidates":[{"ticker":"RELIANCE.NS","name":"Reliance Industries Ltd","sector":"Energy & Conglomerate","as_of_date":"2026-11-13","action_signal":"BUY","intraday_bias":"INTRADAY BUY","gatekeeper_passed":true,"ml_win_probability":0.694,"ml_win_probability_pct":69.4,"entry_price":1339.7,"stop_loss_price":1316.52,"target_price":1386.06,"day_buy_entry":1342.48,"day_buy_t1":1357.55,"day_buy_t2":1366.82,"day_buy_sl":1333.21,"day_sell_entry":1336.92,"day_sell_t1":1321.85,"day_sell_t2":1312.58,"day_sell_sl":1346.19,"atr_14":23.18,"risk_reward_ratio":2.0,"recommended_shares":43,"intraday_shares":107,"position_notional_value":57607.1,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":54.35,"oos_roc_auc":0.5965,"oos_precision_at_60_pct":30.0,"oos_profit_factor_at_60":1.03,"gatekeeper_reasons":["Regime Aligned: Stock (Strong Uptrend) & Index (Strong Uptrend) both support trend continuation.","ML Win Probability (69.40%) meets/exceeds the 60% threshold.","Reward-to-Risk ratio (1:2.00) satisfies the 1:2.0 requirement.","Note: 60-day swing high at 1350.70 sits between Entry (1339.70) and Target (1386.06); monitor price action near 1350.70."]},{"ticker":"ICICIBANK.NS","name":"ICICI Bank Ltd","sector":"Banking","as_of_date":"2026-11-13","action_signal":"BUY","intraday_bias":"INTRADAY BUY","gatekeeper_passed":true,"ml_win_probability":0.6418,"ml_win_probability_pct":64.18,"entry_price":1583.6,"stop_loss_price":1559.77,"target_price":1631.26,"day_buy_entry":1586.46,"day_buy_t1":1601.95,"day_buy_t2":1611.48,"day_buy_sl":1576.93,"day_sell_entry":1580.74,"day_sell_t1":1565.25,"day_sell_t2":1555.72,"day_sell_sl":1590.27,"atr_14":23.83,"risk_reward_ratio":2.0,"recommended_shares":41,"intraday_shares":104,"position_notional_value":64927.6,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":48.64,"oos_roc_auc":0.5422,"oos_precision_at_60_pct":38.46,"oos_profit_factor_at_60":2.47,"gatekeeper_reasons":["Regime Aligned: Stock (Strong Uptrend) & Index (Strong Uptrend) both support trend continuation.","ML Win Probability (64.18%) meets/exceeds the 60% threshold.","Reward-to-Risk ratio (1:2.00) satisfies the 1:2.0 requirement.","Note: 60-day swing high at 1586.00 sits between Entry (1583.60) and Target (1631.26); monitor price action near 1586.00."]},{"ticker":"M&M.NS","name":"Mahindra & Mahindra Ltd","sector":"Automobiles","as_of_date":"2026-11-13","action_signal":"BUY","intraday_bias":"INTRADAY SELL (SHORT)","gatekeeper_passed":true,"ml_win_probability":0.6021,"ml_win_probability_pct":60.21,"entry_price":3333.0,"stop_loss_price":3261.03,"target_price":3476.94,"day_buy_entry":3341.64,"day_buy_t1":3388.42,"day_buy_t2":3417.21,"day_buy_sl":3312.85,"day_sell_entry":3324.36,"day_sell_t1":3277.58,"day_sell_t2":3248.79,"day_sell_sl":3353.15,"atr_14":71.97,"risk_reward_ratio":2.0,"recommended_shares":13,"intraday_shares":34,"position_notional_value":43329.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":50.52,"oos_roc_auc":0.5973,"oos_precision_at_60_pct":65.22,"oos_profit_factor_at_60":11.43,"gatekeeper_reasons":["Regime Aligned: Stock (Strong Uptrend) & Index (Strong Uptrend) both support trend continuation.","ML Win Probability (60.21%) meets/exceeds the 60% threshold.","Reward-to-Risk ratio (1:2.00) satisfies the 1:2.0 requirement."]},{"ticker":"SUNPHARMA.NS","name":"Sun Pharmaceutical Industries Ltd","sector":"Pharmaceuticals","as_of_date":"2026-11-13","action_signal":"BUY","intraday_bias":"RANGE / WAIT FOR BREAKOUT","gatekeeper_passed":true,"ml_win_probability":0.6004,"ml_win_probability_pct":60.04,"entry_price":1880.0,"stop_loss_price":1850.82,"target_price":1938.36,"day_buy_entry":1883.5,"day_buy_t1":1902.47,"day_buy_t2":1914.14,"day_buy_sl":1871.83,"day_sell_entry":1876.5,"day_sell_t1":1857.53,"day_sell_t2":1845.86,"day_sell_sl":1888.17,"atr_14":29.18,"risk_reward_ratio":2.0,"recommended_shares":34,"intraday_shares":85,"position_notional_value":63920.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":46.85,"oos_roc_auc":0.4023,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["Regime Aligned: Stock (Strong Uptrend) & Index (Strong Uptrend) both support trend continuation.","ML Win Probability (60.04%) meets/exceeds the 60% threshold.","Reward-to-Risk ratio (1:2.00) satisfies the 1:2.0 requirement."]}],"all_watchlist_signals":[{"ticker":"RELIANCE.NS","name":"Reliance Industries Ltd","sector":"Energy & Conglomerate","as_of_date":"2026-11-13","action_signal":"BUY","intraday_bias":"INTRADAY BUY","gatekeeper_passed":true,"ml_win_probability":0.694,"ml_win_probability_pct":69.4,"entry_price":1339.7,"stop_loss_price":1316.52,"target_price":1386.06,"day_buy_entry":1342.48,"day_buy_t1":1357.55,"day_buy_t2":1366.82,"day_buy_sl":1333.21,"day_sell_entry":1336.92,"day_sell_t1":1321.85,"day_sell_t2":1312.58,"day_sell_sl":1346.19,"atr_14":23.18,"risk_reward_ratio":2.0,"recommended_shares":43,"intraday_shares":107,"position_notional_value":57607.1,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":54.35,"oos_roc_auc":0.5965,"oos_precision_at_60_pct":30.0,"oos_profit_factor_at_60":1.03,"gatekeeper_reasons":["Regime Aligned: Stock (Strong Uptrend) & Index (Strong Uptrend) both support trend continuation.","ML Win Probability (69.40%) meets/exceeds the 60% threshold.","Reward-to-Risk ratio (1:2.00) satisfies the 1:2.0 requirement.","Note: 60-day swing high at 1350.70 sits between Entry (1339.70) and Target (1386.06); monitor price action near 1350.70."]},{"ticker":"ICICIBANK.NS","name":"ICICI Bank Ltd","sector":"Banking","as_of_date":"2026-11-13","action_signal":"BUY","intraday_bias":"INTRADAY BUY","gatekeeper_passed":true,"ml_win_probability":0.6418,"ml_win_probability_pct":64.18,"entry_price":1583.6,"stop_loss_price":1559.77,"target_price":1631.26,"day_buy_entry":1586.46,"day_buy_t1":1601.95,"day_buy_t2":1611.48,"day_buy_sl":1576.93,"day_sell_entry":1580.74,"day_sell_t1":1565.25,"day_sell_t2":1555.72,"day_sell_sl":1590.27,"atr_14":23.83,"risk_reward_ratio":2.0,"recommended_shares":41,"intraday_shares":104,"position_notional_value":64927.6,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":48.64,"oos_roc_auc":0.5422,"oos_precision_at_60_pct":38.46,"oos_profit_factor_at_60":2.47,"gatekeeper_reasons":["Regime Aligned: Stock (Strong Uptrend) & Index (Strong Uptrend) both support trend continuation.","ML Win Probability (64.18%) meets/exceeds the 60% threshold.","Reward-to-Risk ratio (1:2.00) satisfies the 1:2.0 requirement.","Note: 60-day swing high at 1586.00 sits between Entry (1583.60) and Target (1631.26); monitor price action near 1586.00."]},{"ticker":"M&M.NS","name":"Mahindra & Mahindra Ltd","sector":"Automobiles","as_of_date":"2026-11-13","action_signal":"BUY","intraday_bias":"INTRADAY SELL (SHORT)","gatekeeper_passed":true,"ml_win_probability":0.6021,"ml_win_probability_pct":60.21,"entry_price":3333.0,"stop_loss_price":3261.03,"target_price":3476.94,"day_buy_entry":3341.64,"day_buy_t1":3388.42,"day_buy_t2":3417.21,"day_buy_sl":3312.85,"day_sell_entry":3324.36,"day_sell_t1":3277.58,"day_sell_t2":3248.79,"day_sell_sl":3353.15,"atr_14":71.97,"risk_reward_ratio":2.0,"recommended_shares":13,"intraday_shares":34,"position_notional_value":43329.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":50.52,"oos_roc_auc":0.5973,"oos_precision_at_60_pct":65.22,"oos_profit_factor_at_60":11.43,"gatekeeper_reasons":["Regime Aligned: Stock (Strong Uptrend) & Index (Strong Uptrend) both support trend continuation.","ML Win Probability (60.21%) meets/exceeds the 60% threshold.","Reward-to-Risk ratio (1:2.00) satisfies the 1:2.0 requirement."]},{"ticker":"SUNPHARMA.NS","name":"Sun Pharmaceutical Industries Ltd","sector":"Pharmaceuticals","as_of_date":"2026-11-13","action_signal":"BUY","intraday_bias":"RANGE / WAIT FOR BREAKOUT","gatekeeper_passed":true,"ml_win_probability":0.6004,"ml_win_probability_pct":60.04,"entry_price":1880.0,"stop_loss_price":1850.82,"target_price":1938.36,"day_buy_entry":1883.5,"day_buy_t1":1902.47,"day_buy_t2":1914.14,"day_buy_sl":1871.83,"day_sell_entry":1876.5,"day_sell_t1":1857.53,"day_sell_t2":1845.86,"day_sell_sl":1888.17,"atr_14":29.18,"risk_reward_ratio":2.0,"recommended_shares":34,"intraday_shares":85,"position_notional_value":63920.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":46.85,"oos_roc_auc":0.4023,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["Regime Aligned: Stock (Strong Uptrend) & Index (Strong Uptrend) both support trend continuation.","ML Win Probability (60.04%) meets/exceeds the 60% threshold.","Reward-to-Risk ratio (1:2.00) satisfies the 1:2.0 requirement."]},{"ticker":"SBIN.NS","name":"State Bank of India","sector":"PSU Banking","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"INTRADAY SELL (SHORT)","gatekeeper_passed":false,"ml_win_probability":0.5522,"ml_win_probability_pct":55.22,"entry_price":1080.0,"stop_loss_price":1063.04,"target_price":1113.92,"day_buy_entry":1082.04,"day_buy_t1":1093.06,"day_buy_t2":1099.85,"day_buy_sl":1075.26,"day_sell_entry":1077.96,"day_sell_t1":1066.94,"day_sell_t2":1060.15,"day_sell_sl":1084.74,"atr_14":16.96,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":147,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":59.05,"oos_roc_auc":0.8019,"oos_precision_at_60_pct":60.0,"oos_profit_factor_at_60":3.0,"gatekeeper_reasons":["ML Win Probability (55.22%) is below the strict 60% gatekeeper threshold."]},{"ticker":"TATASTEEL.NS","name":"Tata Steel Ltd","sector":"Metals & Mining","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"RANGE / WAIT FOR BREAKOUT","gatekeeper_passed":false,"ml_win_probability":0.5162,"ml_win_probability_pct":51.62,"entry_price":186.68,"stop_loss_price":183.27,"target_price":193.49,"day_buy_entry":187.09,"day_buy_t1":189.3,"day_buy_t2":190.67,"day_buy_sl":185.73,"day_sell_entry":186.27,"day_sell_t1":184.06,"day_sell_t2":182.69,"day_sell_sl":187.63,"atr_14":3.41,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":735,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Sideways / Choppy","stock_adx_14":46.01,"oos_roc_auc":0.5868,"oos_precision_at_60_pct":100.0,"oos_profit_factor_at_60":4.0,"gatekeeper_reasons":["Regime Filter Blocked: Breakout Buy blocked \u2014 TATASTEEL.NS regime is Sideways / Choppy (ADX=46.0).","ML Win Probability (51.62%) is below the strict 60% gatekeeper threshold."]},{"ticker":"LT.NS","name":"Larsen & Toubro Ltd","sector":"Infrastructure","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"RANGE / WAIT FOR BREAKOUT","gatekeeper_passed":false,"ml_win_probability":0.507,"ml_win_probability_pct":50.7,"entry_price":4143.8,"stop_loss_price":4075.97,"target_price":4279.46,"day_buy_entry":4151.94,"day_buy_t1":4196.03,"day_buy_t2":4223.16,"day_buy_sl":4124.81,"day_sell_entry":4135.66,"day_sell_t1":4091.57,"day_sell_t2":4064.44,"day_sell_sl":4162.79,"atr_14":67.83,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":36,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":54.02,"oos_roc_auc":0.6722,"oos_precision_at_60_pct":56.45,"oos_profit_factor_at_60":3.74,"gatekeeper_reasons":["ML Win Probability (50.70%) is below the strict 60% gatekeeper threshold."]},{"ticker":"TCS.NS","name":"Tata Consultancy Services Ltd","sector":"IT Services","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"INTRADAY SELL (SHORT)","gatekeeper_passed":false,"ml_win_probability":0.4742,"ml_win_probability_pct":47.42,"entry_price":2407.5,"stop_loss_price":2367.24,"target_price":2488.03,"day_buy_entry":2412.33,"day_buy_t1":2438.5,"day_buy_t2":2454.61,"day_buy_sl":2396.22,"day_sell_entry":2402.67,"day_sell_t1":2376.5,"day_sell_t2":2360.39,"day_sell_sl":2418.78,"atr_14":40.26,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":62,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":31.68,"oos_roc_auc":0.6155,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["ML Win Probability (47.42%) is below the strict 60% gatekeeper threshold."]},{"ticker":"AXISBANK.NS","name":"Axis Bank Ltd","sector":"Banking","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"INTRADAY SELL (SHORT)","gatekeeper_passed":false,"ml_win_probability":0.4411,"ml_win_probability_pct":44.11,"entry_price":1331.0,"stop_loss_price":1309.11,"target_price":1374.79,"day_buy_entry":1333.63,"day_buy_t1":1347.86,"day_buy_t2":1356.62,"day_buy_sl":1324.87,"day_sell_entry":1328.37,"day_sell_t1":1314.14,"day_sell_t2":1305.38,"day_sell_sl":1337.13,"atr_14":21.89,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":114,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":35.42,"oos_roc_auc":0.486,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["ML Win Probability (44.11%) is below the strict 60% gatekeeper threshold."]},{"ticker":"MARUTI.NS","name":"Maruti Suzuki India Ltd","sector":"Automobiles","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"RANGE / WAIT FOR BREAKOUT","gatekeeper_passed":false,"ml_win_probability":0.4379,"ml_win_probability_pct":43.79,"entry_price":12854.0,"stop_loss_price":12626.3,"target_price":13309.4,"day_buy_entry":12881.32,"day_buy_t1":13029.32,"day_buy_t2":13120.4,"day_buy_sl":12790.24,"day_sell_entry":12826.68,"day_sell_t1":12678.68,"day_sell_t2":12587.6,"day_sell_sl":12917.76,"atr_14":227.7,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":10,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Sideways / Choppy","stock_adx_14":54.37,"oos_roc_auc":0.5793,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.61,"gatekeeper_reasons":["Regime Filter Blocked: Breakout Buy blocked \u2014 MARUTI.NS regime is Sideways / Choppy (ADX=54.4).","ML Win Probability (43.79%) is below the strict 60% gatekeeper threshold."]},{"ticker":"BHARTIARTL.NS","name":"Bharti Airtel Ltd","sector":"Telecom","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"INTRADAY BUY","gatekeeper_passed":false,"ml_win_probability":0.4222,"ml_win_probability_pct":42.22,"entry_price":2106.0,"stop_loss_price":2071.58,"target_price":2174.83,"day_buy_entry":2110.13,"day_buy_t1":2132.5,"day_buy_t2":2146.27,"day_buy_sl":2096.36,"day_sell_entry":2101.87,"day_sell_t1":2079.5,"day_sell_t2":2065.73,"day_sell_sl":2115.64,"atr_14":34.42,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":72,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":43.4,"oos_roc_auc":0.5613,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["ML Win Probability (42.22%) is below the strict 60% gatekeeper threshold."]},{"ticker":"POWERGRID.NS","name":"Power Grid Corp of India Ltd","sector":"Power Utilities","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"INTRADAY SELL (SHORT)","gatekeeper_passed":false,"ml_win_probability":0.3857,"ml_win_probability_pct":38.57,"entry_price":257.45,"stop_loss_price":253.04,"target_price":266.27,"day_buy_entry":257.98,"day_buy_t1":260.85,"day_buy_t2":262.61,"day_buy_sl":256.22,"day_sell_entry":256.92,"day_sell_t1":254.05,"day_sell_t2":252.29,"day_sell_sl":258.68,"atr_14":4.41,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":568,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Sideways / Choppy","stock_adx_14":37.54,"oos_roc_auc":0.5018,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["Regime Filter Blocked: Breakout Buy blocked \u2014 POWERGRID.NS regime is Sideways / Choppy (ADX=37.5).","ML Win Probability (38.57%) is below the strict 60% gatekeeper threshold."]},{"ticker":"BAJFINANCE.NS","name":"Bajaj Finance Ltd","sector":"NBFC / Financials","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"INTRADAY BUY","gatekeeper_passed":false,"ml_win_probability":0.3452,"ml_win_probability_pct":34.52,"entry_price":1117.0,"stop_loss_price":1094.24,"target_price":1162.52,"day_buy_entry":1119.73,"day_buy_t1":1134.52,"day_buy_t2":1143.63,"day_buy_sl":1110.63,"day_sell_entry":1114.27,"day_sell_t1":1099.48,"day_sell_t2":1090.37,"day_sell_sl":1123.37,"atr_14":22.76,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":109,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":56.17,"oos_roc_auc":0.7256,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["ML Win Probability (34.52%) is below the strict 60% gatekeeper threshold."]},{"ticker":"INFY.NS","name":"Infosys Ltd","sector":"IT Services","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"INTRADAY SELL (SHORT)","gatekeeper_passed":false,"ml_win_probability":0.3118,"ml_win_probability_pct":31.18,"entry_price":1141.5,"stop_loss_price":1119.05,"target_price":1186.4,"day_buy_entry":1144.19,"day_buy_t1":1158.78,"day_buy_t2":1167.76,"day_buy_sl":1135.21,"day_sell_entry":1138.81,"day_sell_t1":1124.22,"day_sell_t2":1115.24,"day_sell_sl":1147.79,"atr_14":22.45,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":111,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Sideways / Choppy","stock_adx_14":39.29,"oos_roc_auc":0.6905,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["Regime Filter Blocked: Breakout Buy blocked \u2014 INFY.NS regime is Sideways / Choppy (ADX=39.3).","ML Win Probability (31.18%) is below the strict 60% gatekeeper threshold."]},{"ticker":"HCLTECH.NS","name":"HCL Technologies Ltd","sector":"IT Services","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"INTRADAY SELL (SHORT)","gatekeeper_passed":false,"ml_win_probability":0.3096,"ml_win_probability_pct":30.96,"entry_price":1378.0,"stop_loss_price":1353.22,"target_price":1427.57,"day_buy_entry":1380.97,"day_buy_t1":1397.08,"day_buy_t2":1406.99,"day_buy_sl":1371.06,"day_sell_entry":1375.03,"day_sell_t1":1358.92,"day_sell_t2":1349.01,"day_sell_sl":1384.94,"atr_14":24.78,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":100,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":46.11,"oos_roc_auc":0.3166,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["ML Win Probability (30.96%) is below the strict 60% gatekeeper threshold."]},{"ticker":"NTPC.NS","name":"NTPC Ltd","sector":"Power Utilities","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"INTRADAY SELL (SHORT)","gatekeeper_passed":false,"ml_win_probability":0.2767,"ml_win_probability_pct":27.67,"entry_price":319.1,"stop_loss_price":313.77,"target_price":329.75,"day_buy_entry":319.74,"day_buy_t1":323.2,"day_buy_t2":325.33,"day_buy_sl":317.61,"day_sell_entry":318.46,"day_sell_t1":315.0,"day_sell_t2":312.87,"day_sell_sl":320.59,"atr_14":5.33,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":469,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Downtrend","stock_adx_14":42.27,"oos_roc_auc":0.688,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["Regime Filter Blocked: Long breakouts blocked: NTPC.NS is in a Strong Downtrend. NTPC.NS is aligned for short/defensive positioning.","ML Win Probability (27.67%) is below the strict 60% gatekeeper threshold."]},{"ticker":"HDFCBANK.NS","name":"HDFC Bank Ltd","sector":"Banking","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"RANGE / WAIT FOR BREAKOUT","gatekeeper_passed":false,"ml_win_probability":0.2664,"ml_win_probability_pct":26.64,"entry_price":804.0,"stop_loss_price":788.47,"target_price":835.05,"day_buy_entry":805.86,"day_buy_t1":815.95,"day_buy_t2":822.16,"day_buy_sl":799.65,"day_sell_entry":802.14,"day_sell_t1":792.05,"day_sell_t2":785.84,"day_sell_sl":808.35,"atr_14":15.53,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":161,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":43.48,"oos_roc_auc":0.6489,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["ML Win Probability (26.64%) is below the strict 60% gatekeeper threshold."]},{"ticker":"ITC.NS","name":"ITC Ltd","sector":"FMCG","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"INTRADAY BUY","gatekeeper_passed":false,"ml_win_probability":0.2395,"ml_win_probability_pct":23.95,"entry_price":285.0,"stop_loss_price":280.22,"target_price":294.57,"day_buy_entry":285.57,"day_buy_t1":288.68,"day_buy_t2":290.59,"day_buy_sl":283.66,"day_sell_entry":284.43,"day_sell_t1":281.32,"day_sell_t2":279.41,"day_sell_sl":286.34,"atr_14":4.78,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":523,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Sideways / Choppy","stock_adx_14":43.42,"oos_roc_auc":0.2251,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["Regime Filter Blocked: Breakout Buy blocked \u2014 ITC.NS regime is Sideways / Choppy (ADX=43.4).","ML Win Probability (23.95%) is below the strict 60% gatekeeper threshold."]},{"ticker":"KOTAKBANK.NS","name":"Kotak Mahindra Bank Ltd","sector":"Banking","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"RANGE / WAIT FOR BREAKOUT","gatekeeper_passed":false,"ml_win_probability":0.1647,"ml_win_probability_pct":16.47,"entry_price":488.55,"stop_loss_price":480.36,"target_price":504.93,"day_buy_entry":489.53,"day_buy_t1":494.85,"day_buy_t2":498.13,"day_buy_sl":486.25,"day_sell_entry":487.57,"day_sell_t1":482.25,"day_sell_t2":478.97,"day_sell_sl":490.85,"atr_14":8.19,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":304,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":49.88,"oos_roc_auc":0.4149,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["ML Win Probability (16.47%) is below the strict 60% gatekeeper threshold."]},{"ticker":"WIPRO.NS","name":"Wipro Ltd","sector":"IT Services","as_of_date":"2026-11-13","action_signal":"WAIT (No Trade)","intraday_bias":"INTRADAY SELL (SHORT)","gatekeeper_passed":false,"ml_win_probability":0.1326,"ml_win_probability_pct":13.26,"entry_price":194.6,"stop_loss_price":191.32,"target_price":201.15,"day_buy_entry":194.99,"day_buy_t1":197.12,"day_buy_t2":198.43,"day_buy_sl":193.68,"day_sell_entry":194.21,"day_sell_t1":192.08,"day_sell_t2":190.77,"day_sell_sl":195.52,"atr_14":3.28,"risk_reward_ratio":2.0,"recommended_shares":0,"intraday_shares":763,"position_notional_value":0.0,"max_capital_at_risk":1000.0,"stock_regime":"Strong Uptrend","stock_adx_14":57.36,"oos_roc_auc":0.3409,"oos_precision_at_60_pct":0.0,"oos_profit_factor_at_60":0.0,"gatekeeper_reasons":["ML Win Probability (13.26%) is below the strict 60% gatekeeper threshold."]}]};
+
+    let activeFeed = FALLBACK_FEED;
+    let activeFilter = "all";
+
+    function renderFeed() {
+      const idx = activeFeed.index_benchmark || {};
+      document.getElementById("niftyBenchmarkText").textContent =
+        `Nifty 50 (${idx.symbol || "^NSEI"}): ${Number(idx.close || 0).toLocaleString("en-IN")} (${idx.regime || "Ready"})`;
+
+      const tbody = document.getElementById("liveTableBody");
+      tbody.innerHTML = "";
+      const list = activeFeed.all_watchlist_signals || [];
+      list.forEach((r) => {
+        if (activeFilter !== "all" && r.intraday_bias !== activeFilter) return;
+        const badgeCls = r.intraday_bias === "INTRADAY BUY"
+          ? "bg-emerald-500/20 text-emerald-300"
+          : (r.intraday_bias === "INTRADAY SELL (SHORT)" ? "bg-rose-500/20 text-rose-300" : "bg-amber-500/15 text-amber-300");
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-800/50";
+        tr.innerHTML = `
+          <td class="py-2 px-2.5 font-bold text-white">${r.ticker}</td>
+          <td class="py-2 px-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${r.intraday_bias}</span></td>
+          <td class="py-2 px-2.5 text-right text-white">₹${Number(r.entry_price).toFixed(2)}</td>
+          <td class="py-2 px-2.5 text-right font-bold text-emerald-400">₹${Number(r.day_buy_entry).toFixed(2)}</td>
+          <td class="py-2 px-2.5 text-right text-emerald-300">₹${Number(r.day_buy_t1).toFixed(1)} / ₹${Number(r.day_buy_t2).toFixed(1)}</td>
+          <td class="py-2 px-2.5 text-right text-rose-400">₹${Number(r.day_buy_sl).toFixed(2)}</td>
+          <td class="py-2 px-2.5 text-right font-bold text-rose-400">₹${Number(r.day_sell_entry).toFixed(2)}</td>
+          <td class="py-2 px-2.5 text-right text-emerald-300">₹${Number(r.day_sell_t1).toFixed(1)} / ₹${Number(r.day_sell_t2).toFixed(1)}</td>
+          <td class="py-2 px-2.5 text-right text-rose-400">₹${Number(r.day_sell_sl).toFixed(2)}</td>
+          <td class="py-2 px-2.5 text-right text-sky-400 font-bold">${Number(r.ml_win_probability_pct).toFixed(1)}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function fetchLiveJson(url) {
+      if (!url || !url.startsWith("https://")) return;
+      try {
+        const res = await fetch(url + "?t=" + Date.now());
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        if (data && data.all_watchlist_signals) {
+          activeFeed = data;
+          document.getElementById("statusDot").className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+          document.getElementById("feedSourceBadge").textContent = "LIVE GITHUB FEED";
+          document.getElementById("feedSourceBadge").className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mono";
+          document.getElementById("feedTimestamp").textContent = `Last Live Scan: ${data.generated_at_ist} • Auto-refreshes every 60s`;
+          renderFeed();
+        }
+      } catch (err) {
+        document.getElementById("statusDot").className = "w-2.5 h-2.5 rounded-full bg-rose-400";
+        document.getElementById("feedTimestamp").textContent = `Live fetch failed (${err.message}) — showing cached snapshot`;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      let savedUrl = DEFAULT_LIVE_FEED_URL;
+      try { savedUrl = localStorage.getItem("nse_live_feed_url") || DEFAULT_LIVE_FEED_URL; } catch (e) {}
+      if (savedUrl) document.getElementById("feedUrlInput").value = savedUrl;
+
+      renderFeed();
+      if (savedUrl) fetchLiveJson(savedUrl);
+
+      document.getElementById("connectFeedBtn").addEventListener("click", () => {
+        const url = document.getElementById("feedUrlInput").value.trim();
+        try { localStorage.setItem("nse_live_feed_url", url); } catch (e) {}
+        fetchLiveJson(url);
+      });
+
+      document.getElementById("refreshNowBtn").addEventListener("click", () => {
+        fetchLiveJson(document.getElementById("feedUrlInput").value.trim());
+      });
+
+      document.getElementById("filterBtnGroup").addEventListener("click", (e) => {
+        const btn = e.target.closest(".f-btn");
+        if (!btn) return;
+        activeFilter = btn.getAttribute("data-f");
+        document.querySelectorAll(".f-btn").forEach((b) => {
+          const on = b.getAttribute("data-f") === activeFilter;
+          b.className = on
+            ? "f-btn px-2.5 py-1 rounded text-xs font-semibold bg-sky-600 text-white"
+            : "f-btn px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-slate-300";
+        });
+        renderFeed();
+      });
+
+      setInterval(() => {
+        const url = document.getElementById("feedUrlInput").value.trim();
+        if (url) fetchLiveJson(url);
+      }, 60000);
+    });
+  </script>
+</body>
+</html>
