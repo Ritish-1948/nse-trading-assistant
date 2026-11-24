@@ -1,6 +1,6 @@
 {
   "agent_feed_version": "1.0",
-  "generated_at_ist": "2026-11-23 11:59:23 IST",
+  "generated_at_ist": "2026-11-24 13:26:03 IST",
   "source_mode": "DIRECT_YFINANCE_LIVE_POLLING (Zero CSV)",
   "index_benchmark": {
     "symbol": "^NSEI",
@@ -17,8 +17,8 @@
       "as_of_date": "2026-11-23",
       "action_signal": "WAIT (No Trade)",
       "gatekeeper_passed": false,
-      "ml_win_probability": 0.4947,
-      "ml_win_probability_pct": 49.47,
+      "ml_win_probability": 0.5137,
+      "ml_win_probability_pct": 51.37,
       "entry_price": 1351.0,
       "stop_loss_price": 1321.32,
       "target_price": 1410.37,
@@ -36,13 +36,13 @@
       "rsi_14": 64.89,
       "ema_20": 1312.7,
       "ema_50": 1277.68,
-      "ema_200": 1312.62,
-      "oos_roc_auc": 0.5445,
-      "oos_precision_at_60_pct": 24.14,
-      "oos_profit_factor_at_60": 0.84,
+      "ema_200": 1312.63,
+      "oos_roc_auc": 0.5115,
+      "oos_precision_at_60_pct": 25.42,
+      "oos_profit_factor_at_60": 0.85,
       "oos_expectancy_r_at_60": -0.1,
       "gatekeeper_reasons": [
-        "ML Win Probability (49.47%) is below the strict 60% gatekeeper threshold."
+        "ML Win Probability (51.37%) is below the strict 60% gatekeeper threshold."
       ]
     },
     {
@@ -50,8 +50,8 @@
       "as_of_date": "2026-11-23",
       "action_signal": "WAIT (No Trade)",
       "gatekeeper_passed": false,
-      "ml_win_probability": 0.4792,
-      "ml_win_probability_pct": 47.92,
+      "ml_win_probability": 0.4778,
+      "ml_win_probability_pct": 47.78,
       "entry_price": 1103.4,
       "stop_loss_price": 1069.45,
       "target_price": 1171.3,
@@ -70,13 +70,13 @@
       "ema_20": 1119.38,
       "ema_50": 1099.75,
       "ema_200": 1161.44,
-      "oos_roc_auc": 0.5729,
-      "oos_precision_at_60_pct": 23.33,
-      "oos_profit_factor_at_60": 1.15,
-      "oos_expectancy_r_at_60": 0.08,
+      "oos_roc_auc": 0.614,
+      "oos_precision_at_60_pct": 37.5,
+      "oos_profit_factor_at_60": 2.99,
+      "oos_expectancy_r_at_60": 0.62,
       "gatekeeper_reasons": [
         "Regime Filter Blocked: Breakout Buy blocked \u2014 INFY.NS regime is Sideways / Choppy (ADX=13.0).",
-        "ML Win Probability (47.92%) is below the strict 60% gatekeeper threshold."
+        "ML Win Probability (47.78%) is below the strict 60% gatekeeper threshold."
       ]
     },
     {
@@ -84,8 +84,8 @@
       "as_of_date": "2026-11-23",
       "action_signal": "WAIT (No Trade)",
       "gatekeeper_passed": false,
-      "ml_win_probability": 0.3366,
-      "ml_win_probability_pct": 33.66,
+      "ml_win_probability": 0.3844,
+      "ml_win_probability_pct": 38.44,
       "entry_price": 4099.9,
       "stop_loss_price": 4016.04,
       "target_price": 4267.63,
@@ -104,12 +104,12 @@
       "ema_20": 4047.05,
       "ema_50": 3948.33,
       "ema_200": 3904.6,
-      "oos_roc_auc": 0.3995,
-      "oos_precision_at_60_pct": 26.32,
-      "oos_profit_factor_at_60": 1.19,
-      "oos_expectancy_r_at_60": 0.11,
+      "oos_roc_auc": 0.4146,
+      "oos_precision_at_60_pct": 25.0,
+      "oos_profit_factor_at_60": 1.09,
+      "oos_expectancy_r_at_60": 0.05,
       "gatekeeper_reasons": [
-        "ML Win Probability (33.66%) is below the strict 60% gatekeeper threshold."
+        "ML Win Probability (38.44%) is below the strict 60% gatekeeper threshold."
       ]
     },
     {
@@ -117,8 +117,8 @@
       "as_of_date": "2026-11-23",
       "action_signal": "WAIT (No Trade)",
       "gatekeeper_passed": false,
-      "ml_win_probability": 0.2581,
-      "ml_win_probability_pct": 25.81,
+      "ml_win_probability": 0.2381,
+      "ml_win_probability_pct": 23.81,
       "entry_price": 1132.65,
       "stop_loss_price": 1106.06,
       "target_price": 1185.84,
@@ -137,12 +137,12 @@
       "ema_20": 1064.4,
       "ema_50": 1026.1,
       "ema_200": 1004.04,
-      "oos_roc_auc": 0.6545,
-      "oos_precision_at_60_pct": 45.45,
-      "oos_profit_factor_at_60": 3.45,
-      "oos_expectancy_r_at_60": 0.78,
+      "oos_roc_auc": 0.6491,
+      "oos_precision_at_60_pct": 48.0,
+      "oos_profit_factor_at_60": 4.11,
+      "oos_expectancy_r_at_60": 0.87,
       "gatekeeper_reasons": [
-        "ML Win Probability (25.81%) is below the strict 60% gatekeeper threshold."
+        "ML Win Probability (23.81%) is below the strict 60% gatekeeper threshold."
       ]
     },
     {
@@ -150,8 +150,8 @@
       "as_of_date": "2026-11-23",
       "action_signal": "WAIT (No Trade)",
       "gatekeeper_passed": false,
-      "ml_win_probability": 0.2541,
-      "ml_win_probability_pct": 25.41,
+      "ml_win_probability": 0.2294,
+      "ml_win_probability_pct": 22.94,
       "entry_price": 817.8,
       "stop_loss_price": 798.07,
       "target_price": 857.26,
@@ -170,12 +170,12 @@
       "ema_20": 781.05,
       "ema_50": 751.46,
       "ema_200": 779.81,
-      "oos_roc_auc": 0.6132,
-      "oos_precision_at_60_pct": 29.63,
-      "oos_profit_factor_at_60": 0.84,
-      "oos_expectancy_r_at_60": -0.11,
+      "oos_roc_auc": 0.6021,
+      "oos_precision_at_60_pct": 22.22,
+      "oos_profit_factor_at_60": 0.57,
+      "oos_expectancy_r_at_60": -0.33,
       "gatekeeper_reasons": [
-        "ML Win Probability (25.41%) is below the strict 60% gatekeeper threshold."
+        "ML Win Probability (22.94%) is below the strict 60% gatekeeper threshold."
       ]
     },
     {
@@ -183,8 +183,8 @@
       "as_of_date": "2026-11-23",
       "action_signal": "WAIT (No Trade)",
       "gatekeeper_passed": false,
-      "ml_win_probability": 0.1662,
-      "ml_win_probability_pct": 16.62,
+      "ml_win_probability": 0.2059,
+      "ml_win_probability_pct": 20.59,
       "entry_price": 1585.5,
       "stop_loss_price": 1552.42,
       "target_price": 1651.65,
@@ -203,12 +203,12 @@
       "ema_20": 1530.38,
       "ema_50": 1458.98,
       "ema_200": 1386.18,
-      "oos_roc_auc": 0.7117,
-      "oos_precision_at_60_pct": 56.52,
-      "oos_profit_factor_at_60": 3.05,
-      "oos_expectancy_r_at_60": 0.79,
+      "oos_roc_auc": 0.7043,
+      "oos_precision_at_60_pct": 48.78,
+      "oos_profit_factor_at_60": 2.16,
+      "oos_expectancy_r_at_60": 0.54,
       "gatekeeper_reasons": [
-        "ML Win Probability (16.62%) is below the strict 60% gatekeeper threshold."
+        "ML Win Probability (20.59%) is below the strict 60% gatekeeper threshold."
       ]
     },
     {
@@ -216,8 +216,8 @@
       "as_of_date": "2026-11-23",
       "action_signal": "WAIT (No Trade)",
       "gatekeeper_passed": false,
-      "ml_win_probability": 0.1225,
-      "ml_win_probability_pct": 12.25,
+      "ml_win_probability": 0.0951,
+      "ml_win_probability_pct": 9.51,
       "entry_price": 2460.0,
       "stop_loss_price": 2390.0,
       "target_price": 2600.01,
@@ -236,12 +236,12 @@
       "ema_20": 2413.87,
       "ema_50": 2357.04,
       "ema_200": 2425.33,
-      "oos_roc_auc": 0.5491,
-      "oos_precision_at_60_pct": 31.25,
-      "oos_profit_factor_at_60": 1.13,
-      "oos_expectancy_r_at_60": 0.08,
+      "oos_roc_auc": 0.5431,
+      "oos_precision_at_60_pct": 32.0,
+      "oos_profit_factor_at_60": 1.16,
+      "oos_expectancy_r_at_60": 0.09,
       "gatekeeper_reasons": [
-        "ML Win Probability (12.25%) is below the strict 60% gatekeeper threshold."
+        "ML Win Probability (9.51%) is below the strict 60% gatekeeper threshold."
       ]
     },
     {
@@ -249,8 +249,8 @@
       "as_of_date": "2026-11-23",
       "action_signal": "WAIT (No Trade)",
       "gatekeeper_passed": false,
-      "ml_win_probability": 0.1003,
-      "ml_win_probability_pct": 10.03,
+      "ml_win_probability": 0.0802,
+      "ml_win_probability_pct": 8.02,
       "entry_price": 2128.5,
       "stop_loss_price": 2085.12,
       "target_price": 2215.27,
@@ -269,12 +269,12 @@
       "ema_20": 2066.21,
       "ema_50": 1977.01,
       "ema_200": 1905.52,
-      "oos_roc_auc": 0.4318,
-      "oos_precision_at_60_pct": 13.04,
-      "oos_profit_factor_at_60": 0.34,
-      "oos_expectancy_r_at_60": -0.54,
+      "oos_roc_auc": 0.4378,
+      "oos_precision_at_60_pct": 12.0,
+      "oos_profit_factor_at_60": 0.31,
+      "oos_expectancy_r_at_60": -0.58,
       "gatekeeper_reasons": [
-        "ML Win Probability (10.03%) is below the strict 60% gatekeeper threshold."
+        "ML Win Probability (8.02%) is below the strict 60% gatekeeper threshold."
       ]
     }
   ]
